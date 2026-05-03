@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-05-03T19:10:39Z",
+  "generator": "scripts/gen/web-ui-data.py",
+  "notes": [
+    "Coverage totals are derived from artifacts/coverage/results/*.json.",
+    "Per-case rows use artifacts/coverage/results/*-results.jsonl by default when available."
+  ],
+  "output_files": [
+    "/home/wogikaze/wgkz/ts2wasm/site/docs/coverage/web-ui/public/data/test-results.json",
+    "/home/wogikaze/wgkz/ts2wasm/site/docs/coverage/web-ui/public/data/coverage.json",
+    "/home/wogikaze/wgkz/ts2wasm/site/docs/coverage/web-ui/public/data/history.json",
+    "/home/wogikaze/wgkz/ts2wasm/site/docs/coverage/web-ui/public/data/metadata.json"
+  ],
+  "schema_version": 1,
+  "sources": [
+    "artifacts/coverage/results/test262.json",
+    "artifacts/coverage/results/tsc.json",
+    "artifacts/coverage/results/tsgo.json",
+    "artifacts/coverage/results/test262-results.jsonl",
+    "artifacts/coverage/results/tsc-results.jsonl",
+    "artifacts/coverage/results/tsgo-results.jsonl"
+  ]
+}
