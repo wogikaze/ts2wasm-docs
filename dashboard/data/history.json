@@ -768,5 +768,27 @@
     "skipped": 10,
     "suite": "tsc",
     "timestamp": "2026-05-03T22:41:23Z"
+  },
+  {
+    "denominator": 53445,
+    "duration_ms": 85,
+    "executed": 30,
+    "failed": 0,
+    "passed": 1,
+    "run_id": "test262-30",
+    "skipped": 29,
+    "suite": "test262",
+    "timestamp": "2026-05-03T23:10:42Z"
+  },
+  {
+    "denominator": 53445,
+    "duration_ms": 181959,
+    "executed": 53445,
+    "failed": 123,
+    "passed": 3964,
+    "run_id": "test262-53445",
+    "skipped": 49480,
+    "suite": "test262",
+    "timestamp": "2026-05-03T23:24:16Z"
   }
 ]
