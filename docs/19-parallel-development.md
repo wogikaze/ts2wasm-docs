@@ -1,108 +1,97 @@
-# Parallel Development Workflow
+# Parallel Parent/Child Development
 
-Workflow for running independent tasks in isolated git worktrees.
+This workflow runs child agents in isolated git worktrees while a parent agent supervises assignment, review, merge, and Discord reporting.
+
+It intentionally does not use `.agents/state`, `current_task.json`, `project_state.json`, or `dev-loop`.
 
 ## Layout
 
 - Worktrees live in sibling directories: `../ts2wasm-<prefix>-<id>-<timestamp>/`
-- Batch scripts under `scripts/dev/`
-- State setup: `_worktrees/setup-worktree.py`
-- Reference corpus symlinked (not copied) via `mise run link-reference`
+- Parent/child prompts live under `.agents/prompts/`
+- Local assignment files live under ignored `reports/agents/<agent_id>/assignment.md`
+- Discord run reports live under ignored `reports/runs/<run_id>/`
+- Reference corpus is symlinked with `mise run link-reference`
 
-## Batch worktree creation
+## Parent Loop
 
-Create up to 12 worktrees per wave for 12-core hardware:
+The parent follows:
+
+```text
+SYNC -> QUEUE_SCAN -> SPLIT_OR_SELECT -> WORKTREE_ASSIGN
+-> CHILD_SUPERVISE -> MERGE_REVIEW -> REPORT -> QUEUE_REFILL
+```
+
+The tracked source of truth remains `issues/`, `docs/`, and git history. Parent queue notes and child assignments are local report artifacts, not tracked state.
+
+## Batch Worktree Creation
+
+Create one worktree per issue:
 
 ```bash
-./scripts/dev/spawn-worktrees.sh \
+mise run spawn-worktrees -- \
   --base master \
   issues/open/225-*.md \
-  issues/open/255-*.md \
-  issues/open/274-*.md
+  issues/open/255-*.md
 ```
 
-Output: JSON manifest with worktree paths, branch names, issue IDs, base refs.
+The command outputs a JSON manifest and creates local assignment files under `reports/agents/`.
 
 Each worktree gets:
-- Isolated git branch from `--base`
-- Reference corpus symlinks
-- Shared cargo `target/` directory (via `.cargo/config.toml` → parent's `target/`)
-- Dev-loop state files (`.agents/state/project_state.json`, `current_task.json`)
 
-## File affinity groups
+- isolated branch from `--base`
+- reference corpus symlink when available
+- shared cargo `target/` through `.cargo/config.toml`
+- no `.agents/state` files
 
-Issues in different groups can safely run in parallel. Groups defined in
-`setup-worktree.py` and `autonomous-parent-orchestrator.md`:
+## Child Launch
 
-| Group | Scope |
-|-------|-------|
-| frontend/parser | `crates/frontend/src/parser/` |
-| frontend/semantics | `crates/frontend/src/`, `crates/ir/src/` |
-| ir/lowering | `crates/ir/src/resolved.rs`, `crates/ir/src/lowered.rs` |
-| runtime/semantics | IR + backend expr_emit + fixtures |
-| runtime/builtins | `crates/runtime-abi/src/` + fixtures |
-| backend/wasm | `crates/backend-wasm/src/` |
-| cli/orchestration | `crates/cli/src/`, `crates/compiler/src/` |
-| test/fixtures | `fixtures/`, `crates/cli/tests/` |
-| meta/issues | `issues/`, `docs/` |
+For each manifest entry, start a child with:
 
-Assign at most one issue per group per wave.
+- prompt: `.agents/prompts/autonomous-child-worker.md`
+- assignment: `reports/agents/<agent_id>/assignment.md`
+- worktree path from the manifest
 
-## Supervision
+The child reports back with a `PARENT_EVENT:` line.
 
-Batch status collection for the 15-minute supervision cycle:
+## Status Collection
+
+Collect all worktree status:
 
 ```bash
-# All worktrees, text table
-./scripts/dev/worktree-batch-status.sh
-
-# Dirty-only, JSON output (for parent agent)
-./scripts/dev/worktree-batch-status.sh --format json --dirty-only
-
-# Ahead-of-base only
-./scripts/dev/worktree-batch-status.sh --ahead-only --base origin/master
+mise run worktree-status -- --format json
 ```
 
-Collects worktree status in parallel using background processes.
+Useful variants:
 
-## Integration
+```bash
+mise run worktree-status -- --dirty-only
+mise run worktree-status -- --ahead-only --base origin/master
+```
 
-When merging multiple parallel branches:
+## Merge Review
 
-1. Merge/cherry-pick branches one at a time, starting with lowest-conflict groups.
-2. For `issues/index.md` conflicts: accept ours and regenerate:
+The parent reviews each child branch before merge:
 
-   ```bash
-   git checkout --ours -- issues/index.md
-   mise run update-issue-index
-   git add issues/index.md
-   ```
+1. Inspect diff scope and commits.
+2. Confirm validation evidence.
+3. Run relevant narrow validation.
+4. Run `mise run check`.
+5. Merge or cherry-pick only after review passes.
+6. Run `mise run update-issue-index` and `mise run check issues` when issues changed.
 
-3. After each merge, run:
+## Discord Reporting
 
-   ```bash
-   mise run update-issue-index -- --check
-   mise run check issues
-   ```
+Discord reporting is required after each parent cycle and issue-close wave:
 
-4. Run `mise run gate` after all branches are merged.
+```bash
+mise run discord-report -- reports/runs/<run_id>/cycle_report.md --run-id <run_id>
+```
 
-## Shared cargo target
-
-All worktrees point `.cargo/config.toml` → parent repo's `target/` directory.
-This:
-- Saves ~1.8 GB per worktree (×12 = ~21.6 GB saved)
-- Reuses compiled crate cache across worktrees
-- Is created automatically by `setup-worktree.py` and `spawn-worktrees.sh`
+If sending fails or no webhook is configured, save the markdown/payload under `reports/runs/<run_id>/` and report that it is deferred.
 
 ## Prerequisites
 
-- Worktree helpers: `scripts/dev/git-worktree.sh`
-- Batch spawn: `scripts/dev/spawn-worktrees.sh`
-- Batch status: `scripts/dev/worktree-batch-status.sh`
-- `.config/nextest.toml` — 8 parallel test workers
-
-## CI hooks
-
-- Pre-commit: fmt + clippy + issue health + markdownlint
-- Pre-push: fast gate + architecture rules + diff smoke + webhook
+- `mise run spawn-worktrees`
+- `mise run worktree-status`
+- `mise run discord-report`
+- `mise run check`

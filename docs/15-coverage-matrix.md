@@ -13,7 +13,8 @@ workstream の進行度ではなく、外部参照スイートに対してどこ
 - 同一 suite に ramp と deterministic selected subset の両方の証拠がある場合は、canonical suite 行を ramp 証拠として残し、選択条件を明示した追加 evidence 行を同じ generated table に追記する。selected subset 行は `evidence` に `--paths-file` / `--path-filter` を含め、canonical ramp 行を置換しない。
 - gate 判定に影響する変更時は、影響する suite 行の `executed` と status 内訳を同時に更新する。
 - `executed` は段階的に増やす。1 回の更新あたり `test262:+50`、`tsc:+30`、`tsgo:+20` を基本ステップとする。
-- `unsupported (DiagCode breakdown)` と `unsupported (feature breakdown)` 列で優先実装対象を可視化する（例: `UnsupportedSyntax:120`, `class:50,import-export:30`）。
+- メイン表は suite-level totals のみに限定し、breakdown は補助表に分離する。
+- `Unsupported Diagnostic Codes` と `Unsupported Features` は、`key:value,key:value` 文字列ではなく、diagnostic code / feature label ごとに列を分けて可視化する。
 
 ## Reference Coverage Dashboard
 
@@ -62,7 +63,8 @@ Unsupported:
 
 - 診断として終了したが、既知未対応として扱う件数。
 - 現在は `InvariantViolation` と `BackendIo` 以外の compiler diagnostics を unsupported として集計する。
-- `unsupported (feature breakdown)` は diagnostic message と reference path から導出した安定 label を集計する。TestRecord の `tracking` も `feature:<label>` を使う。
+- `Unsupported Features` 補助表は diagnostic message と reference path から導出した安定 label を列ごとに集計する。TestRecord の `tracking` も `feature:<label>` を使う。
+- `Unsupported Diagnostic Codes` 補助表は compiler diagnostic code ごとの raw breakdown を列ごとに保持し、メイン coverage 表の可読性を保つ。
 
 Fail:
 
@@ -136,5 +138,5 @@ The coverage matrix above shows test262 execution counts. For detailed test resu
 - reference suite の分母が変わっていないか確認したか
 - 変更対象 suite の `executed` と status 内訳を `artifacts/coverage/reference-coverage-matrix.md` に反映したか
 - `build_coverage%` / `semantic_coverage%` の再計算を反映したか
-- `unsupported (DiagCode breakdown)` と `unsupported (feature breakdown)` が最新の実行結果を反映しているか
+- `Unsupported Features` と `Unsupported Diagnostic Codes` 補助表が最新の実行結果を反映しているか
 - 必要なら `current-state.md` と整合したか

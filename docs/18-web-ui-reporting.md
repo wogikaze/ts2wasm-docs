@@ -45,18 +45,19 @@ refreshes under `/dashboard/`.
 
 ## Local Live Mode
 
-Static report mode reads the generated JSON files once. Local live mode keeps
-the static fallback and adds polling for the test result payload:
+Static report mode reads the generated JSON files once. Vite development mode
+enables local live mode automatically. Static builds can opt into the same
+polling behavior with `live=1`:
 
 ```text
 http://localhost:5173/?live=1
 ```
 
-When `live=1` is present, the Test Results tab polls
-`site/docs/coverage/web-ui/public/data/test-results.json`, updates the summary counters and visible
-rows without a page reload, and displays the live connection state plus the last
-successful refresh time. The default poll interval is two seconds. Local
-debugging can override it with `liveIntervalMs`:
+When live mode is active, the dashboard polls `test-results.json`,
+`coverage.json`, and `history.json`, updates the views without a page reload,
+and displays the live connection state plus the last successful test-results
+refresh time. The default poll interval is two seconds. Local debugging can
+override it with `liveIntervalMs`:
 
 ```text
 http://localhost:5173/?live=1&liveIntervalMs=500

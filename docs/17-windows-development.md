@@ -59,22 +59,14 @@ cargo install ast-grep
 
 すべてのツールを PATH に追加すること。
 
-### 2. jsonschema のインストール（重要）
-
-```powershell
-python -m pip install jsonschema
-```
-
-これは `mise run check agent-state` で必須です。
-
-### 3. リポジトリのクローン
+### 2. リポジトリのクローン
 
 ```powershell
 git clone <repository-url>
 cd ts2wasm
 ```
 
-### 4. mise task の使用
+### 3. mise task の使用
 
 開発コマンドは `mise` に統一します。
 
@@ -111,10 +103,9 @@ mise tasks
 - `gate-all` - harness/toolchain を含むフルゲート
 - `check issues` - issues/ ディレクトリの検証
 - `update-issue-index` - issues/index.md の再生成
-- `check agent-state` - エージェント状態の検証
 - その他多数（`mise tasks` で確認）
 
-### 5. 開発ワークフロー
+### 4. 開発ワークフロー
 
 #### 典型的な開発サイクル
 
@@ -146,7 +137,7 @@ mise run gen-issues-from-coverage -- --suite test262
 mise run reference-triage -- test262 reference/test262/test/path/to/case.js
 ```
 
-### 6. 開始前の最終確認
+### 5. 開始前の最終確認
 
 ```powershell
 # Issue index 検証
@@ -155,9 +146,6 @@ mise run update-issue-index -- --check
 # Issue health 検証
 mise run check issues
 
-# Agent state 検証
-mise run check agent-state
-
 # Repo smoke 検証
 mise run check
 
@@ -165,13 +153,15 @@ mise run check
 mise run gate-fast
 ```
 
-これら5つがすべて通れば開発を開始できます。
+これら4つがすべて通れば開発を開始できます。
+
+### 6. トラブルシューティング
 
 #### "bash not found" でスクリプト失敗
 
 実行しようとしている下位スクリプトが bash 依存。Windows では `mise` 経由の task を使用し、完全機能が必要な場合は WSL2 を使用。
 
-### 8. 制限事項
+### 7. 制限事項
 
 すべての高優先度スクリプトは Python に移行済みで Windows 互換です。
 
