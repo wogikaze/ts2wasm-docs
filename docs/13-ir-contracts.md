@@ -274,10 +274,11 @@ pub fn validate_lowered(program: &LoweredProgram) -> Result<(), Vec<Diagnostic>>
 
 | 検査 | Diagnostic code | 現在の状態 |
 |---|---|---|
-| top_level_statements に Function が入っていないか | `InvariantViolation` | 未実装 |
-| LocalId が範囲内か | `InvariantViolation` | 未実装 |
-| FuncId が範囲内か | `InvariantViolation` | 未実装 |
-| call arity が params 数と一致するか | `ArityMismatch` | 未実装 |
+| top_level_statements に Function が入っていないか | `InvariantViolation` | 実装済み (variant 不在のため構造的に保証) |
+| LocalId が範囲内か | `InvariantViolation` | 実装済み |
+| FuncId が範囲内か | `InvariantViolation` | 実装済み |
+| call arity が params 数と一致するか | `ArityMismatch` | 実装済み |
+| top_level_locals が 0 から連続しているか | `InvariantViolation` | 実装済み (5227) |
 
 ### Resolver の責務と保証
 

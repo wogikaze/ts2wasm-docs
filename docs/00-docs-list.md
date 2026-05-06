@@ -21,6 +21,7 @@
 | `docs/14-runtime-abi.md` | RawValue tagged encoding、heap layout、RuntimeFn catalog、host import ABI | なし | 新規追加 |
 | `docs/15-coverage-matrix.md` | reference coverage の運用ポリシーと gate 基準 | `docs/06` の coverage 方針を運用化 | generated artifact 参照 |
 | `docs/16-commit-and-push-policy.md` | commit/push 方針、agent rule | なし | 新規追加 |
+| `docs/17-jsonl-test-record-schema.md` | JSONL test record 出力スキーマ、status/tracking 定義 | なし | 新規追加 |
 | `docs/18-web-ui-reporting.md` | Web UI の data contract、利用方法、static deployment、export/theme 操作 | coverage dashboard の利用運用 | 新規追加 |
 | `docs/language-reference/javascript-features.md` | JavaScript 構文・機能の対応方針と実装状況 | ECMA-262 仕様に基づく機能一覧 | 新規追加 |
 | `docs/language-reference/typescript-features.md` | TypeScript 構文・機能の対応方針と実装状況 | TypeScript Handbook に基づく機能一覧 | 新規追加 |

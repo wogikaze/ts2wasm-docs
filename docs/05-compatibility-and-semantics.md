@@ -95,6 +95,8 @@ BigInt は heap object representation として設計済みだが、runtime 値�
 
 Object literal/local mixed BigInt comparisons support the narrow direct no-argument arrow `valueOf` / `toString` primitive-return slice for BigInt literals, booleans, supported tagged-int numbers, nullish equality, and supported StringToBigInt strings. Direct no-argument arrow `toString` invalid/out-of-range string returns are source-diagnosed by issue 373; other `ToPrimitive` shapes remain source-diagnosed or unsupported by precise follow-ups: broader object-model-dependent coercion in issue 374 and non-source-backed unknown out-of-range runtime strings in issue 375.
 
+Broader object `ToPrimitive` for mixed BigInt comparison is split by the object-model surface that must be made observable. Direct object-literal or direct local objects with own data properties are the only source-backed shapes that may be folded before the general object model is complete. No-argument own arrow properties and own methods whose body is a single primitive `return` are supported because their receiver, call ordering, and return primitive are statically visible. Prototype lookup, inherited `valueOf` / `toString`, getters, Proxy traps, receiver-sensitive method bodies, mutation/side-effectful coercion, and exception-producing coercion must remain diagnosed or deferred until property lookup, call receiver binding, and completion propagation have explicit runtime contracts. `valueOf` is attempted before `toString` for ordinary comparison coercion; if both return objects, the compatible result is a TypeError rather than silent boolean fallback.
+
 ## Array / object semantics（実装済み範囲）
 
 現行 lowering がカバーする array と object の semantics 要件を記録する。

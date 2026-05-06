@@ -1,7 +1,9 @@
 # Runtime ABI
 
 このドキュメントは ts2wasm の runtime ABI を定める。
-`RawValue` の tagged representation、heap レイアウト、`RuntimeFn` カタログ、host import ABI を定義する。
+`RawValue` の tagged representation (`crates/runtime-abi/src/value.rs`)、
+heap レイアウト (`crates/runtime-abi/src/layout.rs`)、
+`RuntimeFn` カタログ、host import ABI を定義する。
 
 ## Tagged i32 value representation（small-int plus integer heap-number subset）
 
@@ -28,7 +30,19 @@ TAG_MASK:  0b111
 HEAP_MASK: !0b111 (= -8 in two's complement)
 ```
 
-定数は `runtime/value.rs` の `ValueTag` で定義する。
+### Typed wrapper types
+
+`crates/runtime-abi/src/value.rs` は生の `i32` をラップする 3 つの typed wrapper を提供する。
+backend コードはこれらの型を使って、tagged value / heap pointer / raw local value を型レベルで区別する。
+
+- `TaggedValue(i32)`: 完全な JS 値。下位 3 bit が tag。`encode_number(n)`, `decode_number()`, `heap_ptr()`, `from_heap_ptr(ptr, tag)` を提供する。
+- `HeapPtr(u32)`: heap 上の 8-byte aligned ポインタ。`new(offset)` / `new_unchecked(offset)` / `offset(amount)` / `tag(tag)` を提供する。
+- `LocalRawValue(i32)`: wasm local variable slot に格納された未解釈の `i32` 値。`as_tagged()` で `TaggedValue` へ変換する。
+
+backend が生の `i32` を tagged value として直接構築することは禁止。
+かならず `TaggedValue` / `HeapPtr` / `ValueTag` の API を通す。
+
+定数は `crates/runtime-abi/src/value.rs` の `ValueTag` で定義する。
 backend が直接数値を埋め込むことは禁止。
 
 Tagged `number` は small-int payload range
@@ -173,6 +187,45 @@ payload を倍増させた新 array に copy して local を差し替える。e
 として `push` の戻り値を観測する broader path や array-like object receiver は、
 既存の `Array.prototype.push` runtime boundary に従う。
 
+### Heap Object Layout (current)
+
+Ordinary JS object の heap payload 形式。下位 3bit が `0b111` (`object` tag) の
+RawValue が指す先。
+
+```text
+offset + 0  .. +4  : i32 property_count
+offset + 4  .. +8  : i32 flags
+offset + 8  .. +12 : i32 prototype_ptr   (raw heap pointer, object tag なし)
+offset + 12 ..     : (key:value) entries × property_count
+
+RawValue = ptr | OBJECT_TAG (ptr は 8-byte aligned)
+```
+
+`flags` フィールド:
+
+| Bit | 定数 | 意味 |
+|---|---|---|
+| 0 | `OBJECT_FLAG_FROZEN` (1) | Object.freeze() — 全 property が non-writable, non-configurable |
+| 1 | `OBJECT_FLAG_SEALED` (2) | Object.seal() — 全 property が non-configurable |
+| 2+ | `OBJECT_NON_ENUM_SHIFT` | Per-property non-enumerable mask: bit `(2+i)` が 1 のとき property i は非列挙 |
+
+各 entry は `OBJECT_ENTRY_SIZE` (8 bytes) 固定で、`(key_raw_value, value_raw_value)`
+のペア。`key` は interned string の tagged `string` value、`value` は任意の
+RawValue。
+
+定数は `crates/runtime-abi/src/layout.rs` の `Layout` で定義:
+- `OBJECT_HEADER_SIZE` = 12 (property_count + flags + prototype_ptr)
+- `OBJECT_FLAGS_OFFSET` = 4
+- `OBJECT_PROTOTYPE_OFFSET` = 8
+- `OBJECT_ENTRIES_OFFSET` = 12
+- `OBJECT_ENTRY_SIZE` = 8
+- `OBJECT_ENTRY_SHIFT` = 3
+- `OBJECT_VALUE_OFFSET` = 4
+
+Heap number (`HEAP_NUMBER_SENTINEL = -1` が property_count に格納されている object)
+は `object` tag を使うが、上記の property entry 形式ではなく固定 payload 形式を持つ。
+ordinary object と区別するには `i32.load(payload_ptr) == HEAP_NUMBER_SENTINEL` を確認する。
+
 ### Private class private metadata
 
 Class instances with lowered private fields use the GC header reserved word as packed
@@ -182,6 +235,12 @@ private metadata:
 bits 0..15   : private slot count
 bits 16..31  : per-class private brand token
 ```
+
+Mask/shift constants (defined in `crates/backend-wasm/src/expr_emit.rs`):
+- `PRIVATE_FIELD_COUNT_MASK` = `0xffff` (lower 16 bits for slot count)
+- `PRIVATE_FIELD_BRAND_SHIFT` = `16` (brand token shift)
+- `PRIVATE_FIELD_SLOT_SIZE` = `4` (bytes per private slot)
+- `CLASS_INSTANCE_PUBLIC_SLOT_CAPACITY` = `16` (public property slots reserved before private field payload)
 
 `PrivateFieldGet` / `PrivateFieldSet` lowered runtime calls carry both the brand token
 and the slot index. Same-class private field reads/writes, including non-`this`
@@ -395,7 +454,10 @@ GC header:
 
 Closure payload:
 
-  +0  i32 object_subtype     ; CLOSURE_SENTINEL, distinct from property_count
+  +0  i32 object_subtype     ; CLOSURE_SENTINEL (-2), distinct from property_count (>=0)
+
+CLOSURE_SENTINEL は `crates/backend-wasm/src/expr_emit.rs` で定義 (値: -2)。
+ordinary object の `property_count` は常に 0 以上なので、負の値と比較して判別する。
   +4  i32 code_id            ; lowered function identity, stable within module
   +8  i32 capture_count      ; number of RawValue capture slots
   +12 i32 env_flags          ; reserved, must be 0 in the immutable-env slice
@@ -581,12 +643,22 @@ payload_ptr             : type-specific payload
 ```
 
 `flags_and_type` encoding:
-- bit 0: mark bit
-- bit 1: reserved finalizer bit
-- bits 2-4: heap kind (`string`, `array`, `object`, `bigint`)
+- bit 0: mark bit (`GC_MARK_FLAG` = 0x1)
+- bit 1: reserved finalizer bit (`GC_FINALIZABLE_FLAG` = 0x2)
+- bits 2-4: heap kind (shift `GC_KIND_SHIFT` = 2, mask `GC_KIND_MASK` = 0x1c)
 - bits 5-31: reserved
 
-定数は `runtime/layout.rs` の `Layout` で定義:
+GC kind values:
+
+| 定数 | 値 | 種別 |
+|---|---|---|
+| `GC_KIND_UNKNOWN` | 0 | 未指定 (current `$alloc_heap(size)` ABI) |
+| `GC_KIND_STRING` | 4 | String |
+| `GC_KIND_ARRAY` | 8 | Array |
+| `GC_KIND_OBJECT` | 12 | Object / Closure / Heap Number |
+| `GC_KIND_BIGINT` | 16 | BigInt |
+
+定数は `crates/runtime-abi/src/layout.rs` の `Layout` で定義:
 - `GC_HEADER_SIZE`: 16
 - `GC_BODY_SIZE_OFFSET`: 4
 - `GC_SWEEP_NEXT_OFFSET`: 8
@@ -684,3 +756,33 @@ attempt before `memory.grow` or the explicit OOM trap.
 - 初期実装では stack locals の追跡は簡略化 (GC 時に stack frame を走査)
 - Interned strings は GC 対象外 (static data segment)
 - 将来的に write barrier を追加して generational GC へ移行可能
+
+## Module Cache Layout
+
+Module キャッシュは `crates/runtime-abi/src/layout.rs` で定義された固定サイズのエントリ配列。
+動的 `import()` の解決結果をキャッシュする。
+
+```text
+MODULE_CACHE_MAX = 64               ; 最大同時キャッシュ数
+MODULE_CACHE_ENTRY_SIZE = 8         ; 1 エントリ: i32 loaded_flag + i32 value
+
+Entry layout:
+  +0  i32 loaded_flag  ; 1 = loaded, 0 = empty
+  +4  i32 value        ; RawValue (exported module namespace object)
+```
+
+## ABI Versioning
+
+ABI のレイアウト / tag / offset 定数は `RuntimeConst::ABI_VERSION` (現在値: 1) で
+管理する。定数を変更するたびにバージョンをインクリメントする。
+
+機械的検証として `crates/runtime-abi/src/layout.rs` の `abi_layout_golden_snapshot`
+テストが全定数を文字列スナップショットとして記録しており、定数を変更するたびに
+スナップショット期待値を更新し、同時に `ABI_VERSION` をバンプしなければ
+コンパイルが通らない構造になっている。
+
+### Backward compatibility
+
+`ABI_VERSION` が v1 の間は backward-compat archive は不要。v1 以降にバンプした
+場合は、古い wasm モジュールとの互換性検証のために `compat/vN-snapshot.txt`
+形式の参照ファイルを作成する。

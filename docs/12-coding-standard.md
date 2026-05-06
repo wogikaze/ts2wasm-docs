@@ -678,6 +678,10 @@ UNDEFINED / NULL / TRUE / FALSE / NEWLINE を無条件 intern
 
 user string と runtime string は origin を区別可能にする。
 
+実装済み: `StringOrigin` enum (`crates/backend-wasm/src/runtime_fn.rs`)、
+`WatEmitter::intern_string_with_origin()`、`WatEmitter::is_runtime_string()`。
+`RuntimeLinkPlan::string_origins()` が各 runtime string の由来を `RuntimeFn` 単位で追跡する。
+
 ```rust
 enum StringOrigin {
     UserLiteral,
@@ -965,7 +969,7 @@ RuntimeSpec を追加した
 deps を定義した
 imports を定義した
 capability を定義した
-runtime_strings を定義した
+runtime_strings を定義した（StringOrigin で runtime 文字列と user 文字列が区別されること）
 result を定義した
 emission_order に追加した
 all に追加した

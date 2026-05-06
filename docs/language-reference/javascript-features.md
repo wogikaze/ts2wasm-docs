@@ -143,6 +143,8 @@ Lexer/parser の仕様 slice 分割と検証運用は `docs/language-reference/f
 
 BigInt/Number comparison の number-model diagnostic boundary: `NaN` / `Infinity` とその signed unary forms、`Number.NaN` / `Number.POSITIVE_INFINITY` / `Number.NEGATIVE_INFINITY` / other unshadowed `Number.*` numeric constants に加え、statically visible fractional number token sequences（例: `1n == 1.5`, `1.5 < 2n`）は issue-281 diagnostic として扱う。互換 runtime semantics は broader number model work が所有する。
 
+BigInt mixed comparison の object `ToPrimitive` boundary: direct object-literal/local no-argument arrow properties and own no-argument method syntax whose body is a single primitive `return` are implemented for supported primitive literals, preserving ordinary `valueOf` before `toString` ordering. Prototype lookup, inherited methods, getters, Proxy traps, receiver-sensitive method bodies, side effects, and exception-producing coercion remain unsupported until the broader object model and completion propagation contracts are implemented. These follow-ups remain tracked by issue 374 follow-up scope.
+
 | 機能 | ECMAScript | 対応方針 | 実装状況 | 優先度 | Issue ID |
 |---|---|---|---|---|---|
 | `===` (strict equality) | ES3 | primitive fast path | 実装済み（BigInt/BigInt mathematical value 比較を含む） | - | - |

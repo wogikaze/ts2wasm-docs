@@ -83,6 +83,9 @@ ts2wasm build input.ts -o out.wasm --emit-manifest out.manifest.json
     "stderr": false,
     "args": false,
     "env": false,
+    "clock": {
+      "realtime": false
+    },
     "filesystem": {
       "read": [],
       "write": [],

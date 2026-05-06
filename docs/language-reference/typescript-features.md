@@ -277,6 +277,60 @@ TypeScript 構文を frontend/parser slice に分割する運用は `docs/langua
 | Triple-slash directives | ES3 | コンパイラ指示 | 未実装 | P2 | - |
 | `tsconfig.json` | ES3 | コンパイラ設定 | 未実装 | P2 | - |
 
+## Ambient Declarations
+
+TypeScript の `declare` キーワードと ambient declaration ファミリーは、実行時に影響を与えない宣言のみを erasure し、runtime に影響を与える形式は明示的に拒否する。
+
+### Classification
+
+| Category | Ambient form | Erasure behavior | Diagnostic |
+|---|---|---|---|
+| A. Erased (no runtime effect) | `declare function name(...): T;` | Empty function emitted for name resolution; no callable JS runtime binding | Pass |
+| A. Erased | `declare const/let/var name: T;` | Fully erased; no variable binding in lowered IR | Pass |
+| A. Erased | `declare class Name { ... }` | Entire class body erased; no prototype/constructor emitted | Pass |
+| A. Erased | `declare enum Name { ... }` | Enum body erased; no reverse mapping or runtime object | Pass |
+| A. Erased | `declare interface Name { ... }` | Interface erased within declare block | Pass |
+| A. Erased | `declare type T = ...` | Type alias erased within declare block | Pass |
+| A. Erased | `namespace/Module Name { ... }` (no `declare` needed) | Entire namespace body erased; routes to `UnsupportedModule` | `UnsupportedModule` |
+| A. Erased | `declare namespace/module Name { ... }` | Same as above; `declare` is optional for namespaces | `UnsupportedModule` |
+| A. Erased | Class element `declare prop: T;` | Field declaration erased; no instance slot created | Pass |
+| B. Rejected (runtime impact) | `declare global { ... }` | Rejected; cannot be safely erased | `UnsupportedTypeScriptSyntax` |
+| B. Rejected | `declare const x = value;` (with initializer) | Rejected; initializer would create runtime binding | `UnsupportedTypeScriptSyntax` |
+| B. Rejected | Ambient class element `declare prop = value;` | Rejected; initializer would create runtime slot | `UnsupportedTypeScriptSyntax` |
+| C. Parsed for scope only | `declare function name(...)` | Empty function emitted in pending_statements so the name is registered in scope | Pass (scope registration) |
+
+### Erasure scope summary
+
+The ambient erasure boundary covers the intersection of `docs/05-compatibility-and-semantics.md` category 4 (reject or erase precisely) for `ambient-declaration` labeled cases. The following contracts apply:
+
+1. **No silent runtime binding**: Erased ambient forms must not introduce runtime objects, functions, classes, enums, or variable bindings.
+2. **Scope name registration**: `declare function` emits an empty function body so callers can reference the name without unresolved-reference diagnostics.
+3. **Module-shaped erasure**: `declare module` / `declare namespace` erases the body and routes to `UnsupportedModule` when module-shape handling is the remaining blocker.
+4. **Initializer rejection**: Any ambient declaration with a value initializer (`= expr`) is rejected with a diagnostic, regardless of the expression type.
+
+### Covered ambient issues
+
+The following generated ambient-declaration issues from `tsc` and `tsgo` coverage are covered by this erasure boundary (issue 400 + current implementation):
+
+| Issue ID | Title | Erasure category |
+|---|---|---|
+| 140 | ambientClassDeclarationWithExtends (tsc) | A. Erased (class) |
+| 145 | ambientEnum (tsc) | A. Erased (enum) |
+| 150 | ambientExternalModuleReopen (tsc) | A. Erased (module/namespace) |
+| 160 | ambientModules (tsc) | A. Erased (module/namespace) |
+| 162 | ambientPropertyDeclarationInJs (tsc) | A. Erased (class element) |
+| 144 | ambientConstLiterals (tsc) | A. Erased (variable) |
+| 148 | ambientExportDefaultErrors (tsc) | A. Erased (export declare) |
+| 519 | ambientClassDeclaredBeforeBase | A. Erased (class) |
+| 522 | ambientErrors | A. Erased (general) |
+| 531 | ambientModuleExports | A. Erased (module) |
+| 534 | ambientModules | A. Erased (module) |
+| 536 | ambientRequireFunction | A. Erased (variable) |
+| 607 | ambientEnumElementInitializer | A. Erased (enum) |
+| 608 | ambientErrors | A. Erased (general) |
+
+Issues that remain open because they require more than erasure behavior (e.g., overload merging, declaration emit, runtime semantics) are not covered by this boundary and are tracked individually.
+
 ## 実装方針の原則
 
 1. **TypeScript 準拠**: 可能な限り TypeScript 仕様に準拠する
