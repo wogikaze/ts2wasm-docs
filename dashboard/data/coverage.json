@@ -2,12 +2,12 @@
   "byPriority": {
     "future": 7,
     "p0": 3290,
-    "p1": 1750,
+    "p1": 1749,
     "p2": 48351,
     "p3": 273
   },
   "future": 7,
-  "implemented": 6376,
+  "implemented": 6377,
   "suites": [
     {
       "blocked": 667,
@@ -23,7 +23,7 @@
     },
     {
       "blocked": 11,
-      "build_pass": 2841,
+      "build_pass": 2842,
       "denominator": 6419,
       "executed": 6412,
       "fail": 12,
@@ -31,7 +31,7 @@
       "skip_with_reason": 0,
       "source": "artifacts/coverage/results/tsc.json",
       "suite": "tsc",
-      "unsupported": 3548
+      "unsupported": 3547
     },
     {
       "blocked": 0,
@@ -47,5 +47,5 @@
     }
   ],
   "total": 60047,
-  "unimplemented": 53664
+  "unimplemented": 53663
 }
