@@ -161,7 +161,7 @@ BigInt mixed comparison の object `ToPrimitive` boundary: direct object-literal
 | `instanceof` | ES1 | prototype chain check | 実装済み（ordinary class constructor / prototype-chain traversal; `Symbol.hasInstance` は対象外） | - | 207 |
 | `in` | ES1 | property existence check | 実装済み (basic) | - | 031 |
 | `delete` | ES1 | property deletion | 実装済み (basic) | - | 032 |
-| `void` | ES1 | return undefined | 未実装 | P2 | - |
+| `void` | ES1 | return undefined | 実装済み | - | 5143 |
 
 ## 文
 
@@ -171,8 +171,8 @@ BigInt mixed comparison の object `ToPrimitive` boundary: direct object-literal
 | `switch` / `case` | ES3 | multi-way branch | 実装済み (fall-through / default ordering differential coverage) | - | 208 |
 | `for` | ES1 | loop | 実装済み | - | - |
 | `while` / `do-while` | ES1 | loop | 実装済み | - | 034 |
-| `for...in` | ES1 | property enumeration | 未実装 | P2 | - |
-| `for...of` | ES6 | iterator protocol | 未実装 | P2 | - |
+| `for...in` | ES1 | property enumeration | 部分実装 (runtime trap) | P2 | 034 |
+| `for...of` | ES6 | iterator protocol | 実装済み | - | 034, 230 |
 | `break` / `continue` | ES1 | loop control | 実装済み (unlabeled / labeled) | - | 035, 209 |
 | `return` | ES1 | function return | 実装済み | - | - |
 | `throw` | ES3 | exception | 実装済み (diagnostic付き) | - | - |
