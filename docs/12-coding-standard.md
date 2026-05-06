@@ -458,10 +458,6 @@ synthetic node は generated span を持つ。
 Span::generated("lowered implicit undefined return")
 ```
 
-Source-originating diagnostics には `SourceDiagnostic`（必須 `Span`）を使う。
-Internal compiler diagnostics（`InvariantViolation`, `BackendIo`）には `InternalDiagnostic`（任意 `Option<Span>`）を使う。
-両方とも従来の `Diagnostic` 型に変換可能。
-
 必ず span を持つ diagnostic:
 
 ```text
@@ -1080,7 +1076,6 @@ unsupported と invariant violation を混同していない
 ```text
 source 起因なのに InvariantViolation
 source 起因なのに span: None
-source 起因の新規エラーに SourceDiagnostic を使っていない
 unsupported feature を silent fallback
 未実装 runtime を undefined で返して通す
 ```
