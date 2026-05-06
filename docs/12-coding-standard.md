@@ -1198,13 +1198,23 @@ unsupported / limitation が docs に残っている
 
 新しい WAT 生成コードは、生の文字列連結よりも `wat_writer` モジュールの typed API を優先する。
 
-```text
-OK:
-  WatWriter::new()
-      .add_import(&WatImport::new("module", "name", "$symbol"))
+```rust
+// OK — typed methods on WatWriter:
+writer.call(4, "$func_name");
+writer.i32_const(4, 42);
+writer.local_get(4, 0);
+writer.local_set(4, 0);
+writer.drop(4);
+writer.r#if(4);
+writer.then(4);
+writer.end(4);
 
-NOT OK:
-  wat.push_str(&format!("  (import \"{}\" \"{}\" (func {}))\n", module, name, symbol))
+// OK — line_fmt fallback for complex inline patterns:
+writer.line_fmt(4, format_args!("(i32.const {}) // example", val));
+
+// NOT OK — raw String emission:
+wat.push_str(&format!("{pad}(local.get {})\n", id));
+wat.push_str(&format!("{pad}(call {})\n", name));
 ```
 
 既存の `runtime_builder.rs` の生の文字列連結は、段階的に typed writer に置換する。
