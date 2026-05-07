@@ -1,25 +1,25 @@
 {
   "byPriority": {
     "future": 7,
-    "p0": 3422,
-    "p1": 1779,
-    "p2": 48085,
+    "p0": 3429,
+    "p1": 1780,
+    "p2": 48070,
     "p3": 265
   },
   "future": 7,
-  "implemented": 6495,
+  "implemented": 6502,
   "suites": [
     {
       "blocked": 686,
-      "build_pass": 3510,
+      "build_pass": 3517,
       "denominator": 53454,
       "executed": 53454,
-      "fail": 2711,
-      "semantic_pass": 3510,
+      "fail": 2718,
+      "semantic_pass": 3517,
       "skip_with_reason": 0,
       "source": "artifacts/coverage/results/test262.json",
       "suite": "test262",
-      "unsupported": 46547
+      "unsupported": 46533
     },
     {
       "blocked": 13,
@@ -47,5 +47,5 @@
     }
   ],
   "total": 60053,
-  "unimplemented": 53551
+  "unimplemented": 53544
 }
