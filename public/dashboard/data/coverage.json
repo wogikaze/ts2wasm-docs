@@ -1,29 +1,29 @@
 {
   "byPriority": {
     "future": 7,
-    "p0": 3360,
-    "p1": 1776,
-    "p2": 48230,
+    "p0": 3417,
+    "p1": 1778,
+    "p2": 48144,
     "p3": 265
   },
   "future": 7,
-  "implemented": 6415,
+  "implemented": 6442,
   "suites": [
     {
-      "blocked": 668,
-      "build_pass": 3428,
+      "blocked": 686,
+      "build_pass": 3456,
       "denominator": 53454,
       "executed": 53454,
-      "fail": 2667,
-      "semantic_pass": 3428,
+      "fail": 2706,
+      "semantic_pass": 3456,
       "skip_with_reason": 0,
       "source": "artifacts/coverage/results/test262.json",
       "suite": "test262",
-      "unsupported": 46691
+      "unsupported": 46606
     },
     {
       "blocked": 13,
-      "build_pass": 2917,
+      "build_pass": 2916,
       "denominator": 6419,
       "executed": 6412,
       "fail": 12,
@@ -31,7 +31,7 @@
       "skip_with_reason": 0,
       "source": "artifacts/coverage/results/tsc.json",
       "suite": "tsc",
-      "unsupported": 3470
+      "unsupported": 3471
     },
     {
       "blocked": 0,
@@ -47,5 +47,5 @@
     }
   ],
   "total": 60053,
-  "unimplemented": 53631
+  "unimplemented": 53604
 }
