@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T07:39:04Z",
+  "generated_at": "2026-05-07T07:58:15Z",
   "generator": "scripts/gen/web-ui-data.py",
   "notes": [
     "Coverage totals are derived from artifacts/coverage/results/*.json.",
