@@ -6,7 +6,7 @@ Do not edit manually.
 <!-- coverage-table:start -->
 | suite | denominator | executed | build_coverage% | semantic_coverage% | build_pass | semantic_pass | fail | unsupported | blocked | skip-with-reason | status | evidence |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
-| test262 | 53449 | 200 | 0.02 | 0.01 | 11 | 6 | 0 | 189 | 1 | 0 | in-progress | `mise run reference-coverage -- test262 --limit 200` |
+| test262 | 53449 | 300 | 0.08 | 0.04 | 45 | 20 | 0 | 255 | 1 | 0 | in-progress | `mise run reference-coverage -- test262 --limit 300` |
 | tsc | 6419 | 1 | 0.00 | 0.00 | 0 | 0 | 0 | 1 | 0 | 0 | in-progress | `mise run reference-coverage -- tsc --path-filter reference/typescript/tests/cases/compiler/avoidCycleWithVoidExpressionReturnedFromArrow.ts` |
 | tsgo | 166 | 166 | 30.12 | 0.00 | 50 | 0 | 1 | 115 | 0 | 0 | in-progress | `mise run reference-coverage -- tsgo` |
 <!-- coverage-table:end -->
@@ -14,19 +14,19 @@ Do not edit manually.
 ## Unsupported Diagnostic Codes
 
 <!-- diagcode-table:start -->
-| suite | executed | unsupported | UnsupportedSyntax | UnresolvedFunction | UnresolvedName | UnsupportedModule | UnsupportedTypeScriptSyntax | UnsupportedEval | DuplicateFunction | evidence |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| test262 | 200 | 189 | 84 | 61 | 42 | 0 | 0 | 2 | 0 | `mise run reference-coverage -- test262 --limit 200` |
-| tsc | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | `mise run reference-coverage -- tsc --path-filter reference/typescript/tests/cases/compiler/avoidCycleWithVoidExpressionReturnedFromArrow.ts` |
-| tsgo | 166 | 115 | 77 | 1 | 8 | 24 | 4 | 0 | 1 | `mise run reference-coverage -- tsgo` |
+| suite | executed | unsupported | UnsupportedSyntax | UnresolvedName | UnresolvedFunction | UnsupportedModule | UnsupportedTypeScriptSyntax | DuplicateLocal | UnsupportedEval | DuplicateFunction | evidence |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| test262 | 300 | 255 | 109 | 71 | 70 | 0 | 0 | 3 | 2 | 0 | `mise run reference-coverage -- test262 --limit 300` |
+| tsc | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | `mise run reference-coverage -- tsc --path-filter reference/typescript/tests/cases/compiler/avoidCycleWithVoidExpressionReturnedFromArrow.ts` |
+| tsgo | 166 | 115 | 77 | 8 | 1 | 24 | 4 | 0 | 0 | 1 | `mise run reference-coverage -- tsgo` |
 <!-- diagcode-table:end -->
 
 ## Unsupported Features
 
 <!-- feature-table:start -->
-| suite | executed | unsupported | function-resolution | name-resolution | regexp-literal | import-export | string-builtin | unknown-unsupported | date | jsx | declaration-emit | function | type-system | class | decorator | parser-syntax | jsdoc | enum | eval | module-resolution | parameter-property | type-assertion | array-builtin | class-accessor | duplicate-function | module-system-amd | object-literal | scope-analysis | type-alias | evidence |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| test262 | 200 | 189 | 61 | 42 | 45 | 0 | 22 | 0 | 10 | 0 | 0 | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | `mise run reference-coverage -- test262 --limit 200` |
-| tsc | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | `mise run reference-coverage -- tsc --path-filter reference/typescript/tests/cases/compiler/avoidCycleWithVoidExpressionReturnedFromArrow.ts` |
-| tsgo | 166 | 115 | 1 | 8 | 0 | 38 | 0 | 20 | 0 | 8 | 6 | 0 | 5 | 4 | 4 | 4 | 3 | 2 | 0 | 2 | 2 | 2 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | `mise run reference-coverage -- tsgo` |
+| suite | executed | unsupported | name-resolution | function-resolution | regexp-literal | import-export | string-builtin | unknown-unsupported | eval | date | legacy-global-builtin | jsx | declaration-emit | function | type-system | class | decorator | parser-syntax | duplicate-local | jsdoc | enum | module-resolution | parameter-property | type-assertion | array-builtin | builtin-api | class-accessor | duplicate-function | module-system-amd | object-literal | scope-analysis | type-alias | evidence |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| test262 | 300 | 255 | 71 | 70 | 45 | 0 | 22 | 0 | 17 | 10 | 9 | 0 | 0 | 6 | 0 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | `mise run reference-coverage -- test262 --limit 300` |
+| tsc | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | `mise run reference-coverage -- tsc --path-filter reference/typescript/tests/cases/compiler/avoidCycleWithVoidExpressionReturnedFromArrow.ts` |
+| tsgo | 166 | 115 | 8 | 1 | 0 | 38 | 0 | 20 | 0 | 0 | 0 | 8 | 6 | 0 | 5 | 4 | 4 | 4 | 0 | 3 | 2 | 2 | 2 | 2 | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | `mise run reference-coverage -- tsgo` |
 <!-- feature-table:end -->
