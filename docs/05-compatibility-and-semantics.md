@@ -126,6 +126,40 @@ defined in `docs/14-runtime-abi.md`.
 
 `$property_get` の reverse scan により、`{a:1, a:2}.a === 2` が成立する (JS 仕様準拠)。
 
+## Date timezone formatting policy (issue 5244)
+
+`Date.prototype.toString()` and related formatting methods (`toDateString`, `toTimeString`,
+`toISOString`) require access to the local timezone offset to produce human-readable output.
+
+### Constraints
+
+1. **Standalone WASI mode**: No host timezone API is available. WASI preview 1 provides
+   `clock_time_get` (realtime/monotonic) but no timezone database or offset query.
+2. **Node host shim**: When `host.date.*` imports are available, we can use Node's
+   `Intl.DateTimeFormat` or `Date.prototype.getTimezoneOffset` host shim.
+
+### Policy
+
+| Mode | Timezone behavior | Implementation |
+|---|---|---|
+| Standalone WASI | UTC-only: all formatting methods return UTC-based strings | Runtime builtin with hardcoded UTC offset calculation from epoch milliseconds. No timezone name suffix (e.g., `"GMT+0000"`) |
+| Node host shim | Full local timezone from host | `host.date.getTimezoneOffset(epoch_ms)` returns minutes offset. Date formatting uses host offset to produce local-time strings |
+| WASI + limited host | Explicit host import per call | Each formatting method that needs timezone declares `host.date.getTimezoneOffset` in capability manifest |
+
+### Implementation order
+
+1. **Phase 1**: Implement UTC-only `Date.prototype.toString()` in WAT runtime using
+   calendar math (year/month/day/hour/minute/second from epoch ms). Output format:
+   `"Tue, 01 Jan 2026 00:00:00 GMT"`. This is standalone-capable.
+2. **Phase 2**: Add `host.date.getTimezoneOffset` shim (WAT→host). Use offset to compute
+   local time and append timezone offset string. This requires Node host.
+3. **Phase 3 (deferred)**: Full `Intl.DateTimeFormat`-style formatting with
+   locale-aware month/day names.
+
+The current `Date.prototype.toString()` is blocked on Phase 1 implementation.
+Issue 050 tracks the overall Date implementation. Issue 5244 tracks this policy.
+Annex B legacy methods (`getYear`, `setYear`, `toGMTString`) remain issue-241 diagnostics.
+
 > **残タスク**: RuntimeLinkPlan と WatEmitter の分離、AST に一貫した `Span`、BuiltinResolver pass の整理、
 > capability manifest の本番出力などは、`current-state.md` と `docs/11-shared-definitions.md` の gate / issue で追跡する。
 
