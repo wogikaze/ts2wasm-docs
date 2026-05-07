@@ -1,35 +1,35 @@
 [
   {
     "denominator": 53454,
-    "duration_ms": 357362,
+    "duration_ms": 359230,
     "executed": 53454,
     "failed": 3503,
     "passed": 3516,
     "run_id": "test262-53454",
     "skipped": 46435,
     "suite": "test262",
-    "timestamp": "2026-05-07T14:26:33Z"
+    "timestamp": "2026-05-07T14:36:59Z"
   },
   {
     "denominator": 6419,
-    "duration_ms": 96524,
+    "duration_ms": 95625,
     "executed": 6412,
     "failed": 25,
     "passed": 2904,
     "run_id": "tsc-6412",
     "skipped": 3483,
     "suite": "tsc",
-    "timestamp": "2026-05-07T14:28:10Z"
+    "timestamp": "2026-05-07T14:38:35Z"
   },
   {
     "denominator": 180,
-    "duration_ms": 125,
+    "duration_ms": 123,
     "executed": 180,
     "failed": 0,
     "passed": 69,
     "run_id": "tsgo-180",
     "skipped": 111,
     "suite": "tsgo",
-    "timestamp": "2026-05-07T14:28:11Z"
+    "timestamp": "2026-05-07T14:38:36Z"
   }
 ]
