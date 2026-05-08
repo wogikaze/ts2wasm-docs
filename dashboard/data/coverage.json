@@ -2,12 +2,12 @@
   "byPriority": {
     "future": 7,
     "p0": 3825,
-    "p1": 2122,
-    "p2": 47399,
+    "p1": 2120,
+    "p2": 47402,
     "p3": 210
   },
   "future": 7,
-  "implemented": 6501,
+  "implemented": 6506,
   "suites": [
     {
       "blocked": 719,
@@ -35,17 +35,17 @@
     },
     {
       "blocked": 0,
-      "build_pass": 69,
-      "denominator": 180,
-      "executed": 180,
+      "build_pass": 74,
+      "denominator": 186,
+      "executed": 186,
       "fail": 0,
       "semantic_pass": 0,
       "skip_with_reason": 0,
       "source": "artifacts/coverage/results/tsgo.json",
       "suite": "tsgo",
-      "unsupported": 111
+      "unsupported": 112
     }
   ],
-  "total": 60064,
-  "unimplemented": 53556
+  "total": 60070,
+  "unimplemented": 53557
 }
