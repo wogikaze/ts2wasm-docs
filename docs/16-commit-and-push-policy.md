@@ -212,6 +212,17 @@ agent は以下を守る。
 9. dirty tree を理由に停止せず、差分を分類して commit または明示的に保留する
 10. product implementation と orchestration-state diff を混ぜない
 
+## issue close の検証ルール（過剰クローズ防止）
+
+issue を close する際は、以下を厳守する。
+
+1. **issue の内容を読んでから判断する**: title だけで判断せず、Problem / Scope / Acceptance criteria を読んで、何が実装されたべきかを理解してから close する。
+2. **対象機能を実際にテストする**: 無関係なコード（`let x = 1;` など）でコンパイルが通ったからといって close しない。issue が tracking している機能を実際にコードとして書き、ビルド・実行まで確認する。
+3. **1 commit に複数の close を含めない**: close 理由が異なる issue を 1 commit にまとめない。実装が伴わない close（既に実装済みの確認、調査のみ）も close ごとに分ける。
+4. **一括クローズ禁止**: 未読の issue をまとめて close しない。1 つずつ読み、検証してから close する。
+5. **unsupported 診断が出るものは close しない**: 対象機能が `UnsupportedSyntax` / `UnsupportedModule` / `UnsupportedRuntimeSubset` などの診断を出す場合は close しない。その issue は未実装である。
+6. **close 前に検証コマンドを実行する**: 対象機能が実際に動作することを確認するコマンドを実行し、結果を completion evidence に記録する。
+
 ## 推奨 commit 粒度
 
 | 作業                   | commit 粒度                            |
