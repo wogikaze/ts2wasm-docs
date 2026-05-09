@@ -1,13 +1,13 @@
 {
   "byPriority": {
     "future": 7,
-    "p0": 4951,
-    "p1": 2129,
-    "p2": 44055,
-    "p3": 183
+    "p0": 4950,
+    "p1": 2114,
+    "p2": 44097,
+    "p3": 187
   },
   "future": 7,
-  "implemented": 8752,
+  "implemented": 8722,
   "suites": [
     {
       "blocked": 1077,
@@ -22,8 +22,8 @@
       "unsupported": 42793
     },
     {
-      "blocked": 16,
-      "build_pass": 2922,
+      "blocked": 15,
+      "build_pass": 2892,
       "denominator": 6419,
       "executed": 6412,
       "fail": 10,
@@ -31,7 +31,7 @@
       "skip_with_reason": 0,
       "source": "artifacts/coverage/results/tsc.json",
       "suite": "tsc",
-      "unsupported": 3464
+      "unsupported": 3495
     },
     {
       "blocked": 0,
@@ -47,5 +47,5 @@
     }
   ],
   "total": 60077,
-  "unimplemented": 51318
+  "unimplemented": 51348
 }
