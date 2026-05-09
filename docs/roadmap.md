@@ -70,7 +70,7 @@ W1 is the **initial baseline gate**. Ongoing host capability auditing belongs to
 
 - [ ] WASI args support: `args_get` / `args_sizes_get`
 - [ ] WASI env support: `environ_get` / `environ_sizes_get`
-- [ ] WASI `proc_exit` clean exit
+- [X] WASI `proc_exit` clean exit — routed through HostImport system during issue 128
 - [ ] WASI clock resolution: `clock_res_get`
 - [ ] Standalone iwasm/WAMR smoke test coverage
 - [ ] Capability manifest entries for every new WASI import
@@ -90,15 +90,15 @@ W2 = "parse or precise reject". Runtime semantics belong to W4/W5.
 
 - [X] RegExp literal flags: `g`, `i`, `m` — id 109 done
 - [X] RegExp literal flags: `s`, `u`, `y` — id 110 done (d flag rejected with precise diagnostic)
-- [ ] SequenceExpression
+- [X] SequenceExpression — already implemented, id 118
 - [X] Optional chaining — already implemented (OptionalMember/OptionalCall/OptionalIndex in AST)
 - [X] Nullish coalescing — already implemented (BinaryOp::NullishCoalesce)
-- [ ] `yield` / generator syntax parsing
-- [ ] `async` / `await` syntax parsing
-- [ ] `with` / `debugger`
-- [ ] Annex B block-level function hoisting syntax handling
-- [ ] Cover initializers
-- [ ] Labelled function declarations
+- [X] `yield` / generator syntax parsing — already compiles
+- [X] `async` / `await` syntax parsing — already compiles
+- [X] `with` / `debugger` — precise diagnostic added, id 125
+- [X] Annex B block-level function hoisting syntax handling — id 126
+- [X] Cover initializers — id 124
+- [X] Labelled function declarations — id 126
 - [ ] JSX parsing
 - [ ] Decorator parsing
 - [ ] TypeScript parameter property parsing
@@ -205,7 +205,7 @@ Work here runs in parallel with W2-W5 implementation: each feature change should
 - [X] Ramp 500 → 2,000 with stable parallel execution and caching — already works (--jobs N flag)
 - [ ] Ramp 2,000 → 10,000 / 10,000 → 30,000 / 30,000 → 53,445
 - [X] Regression detection: fail on build_pass / semantic_pass decrease — [x] `--record-baseline` / `--compare-baseline` flags (id 107 done)
-- [ ] Delta reporting: feature-level and diagnostic-class pass/fail deltas
+- [X] Delta reporting: feature-level and diagnostic-class pass/fail deltas — id 128
 - [ ] Coverage dashboard: trend graph, feature-level burn-down, diagnostic burn-down
 - [ ] Gate progress visualization
 
@@ -223,7 +223,7 @@ Goal: every host interaction should be explicit, auditable, and deny-testable.
 This is a **cross-cutting validation track** that protects the core project constraint:
 generated WASM should not silently depend on Node.js or hidden host capabilities.
 
-- [ ] Full host import audit with `--emit-manifest`
+- [X] Full host import audit with `--emit-manifest` — id 129
 - [ ] Manifest golden tests for all supported fixtures
 - [ ] Host-deny test matrix expansion
 - [ ] Standalone assurance for new features (Promise, Proxy, Reflect, TypedArray, WASI args/env)
