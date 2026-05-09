@@ -32,9 +32,9 @@
 
 ## Language reference tracking
 
-`docs/language-reference/*.md` は仕様カバレッジの全体像をトラックするマップであり、個別の実装作業は `issues/` で管理する。
+`docs/language-reference/*.md` は仕様カバレッジの全体像をトラックするマップであり、個別の実装作業は `TRACKING.yaml` で管理する。
 
-Frontend lexer/parser の仕様 slice を作る場合は `docs/language-reference/frontend-parser-wave.md` を先に参照し、ECMA-262 / TypeScript parser source から child issue を切る。
+Frontend lexer/parser の仕様 slice を作る場合は `docs/language-reference/frontend-parser-wave.md` を先に参照する。
 
 ### language-reference テーブルの列
 
@@ -53,15 +53,15 @@ Frontend lexer/parser の仕様 slice を作る場合は `docs/language-referenc
 
 優先度の詳細は `docs/11-shared-definitions.md` の「Feature priority guidelines」を参照。
 
-### language-reference と issues の連携
+### language-reference と TRACKING.yaml の連携
 
 - language-reference は仕様カバレッジの全体像を提供
-- 具体的実装作業は issues でトラック
+- 具体的実装作業は `TRACKING.yaml` でトラック
 - 実装作業を開始する際:
   1. language-reference で対象機能を特定
   2. 必要なら優先度を設定
-  3. 実装用 issue を作成
-  4. language-reference の Issue ID 列にリンク
+  3. `TRACKING.yaml` にエントリを追加
+  4. language-reference の該当行に tracking ID を追記
 
 ### 進捗レポート
 

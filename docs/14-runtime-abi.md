@@ -5,6 +5,8 @@
 heap レイアウト (`crates/runtime-abi/src/layout.rs`)、
 `RuntimeFn` カタログ、host import ABI を定義する。
 
+> **ABI contract**: The logical ABI (`jsval` = `i64`, defined in `docs/04`) is the semantic value type at import/export boundaries. The wire representation (`RawValue` = `i32` tagged encoding, defined below) is the actual wasm module encoding. These two representations must be kept distinct; any conversion between them requires an explicit bridge in the backend layer. See `docs/04-compiler-architecture-and-runtime.md` §Runtime ABI for the policy.
+
 ## Tagged i32 value representation（small-int plus integer heap-number subset）
 
 ### RawValue (i32 tagged encoding)
