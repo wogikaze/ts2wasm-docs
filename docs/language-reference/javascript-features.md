@@ -198,13 +198,14 @@ BigInt mixed comparison の object `ToPrimitive` boundary: direct object-literal
 
 | 機能 | ECMAScript | 対応方針 | 実装状況 | 優先度 | Issue ID |
 |---|---|---|---|---|---|
-| object literal `{k: v}` | ES1 | heap object | 実装済み (identifier keys only) | - | - |
+| object literal `{k: v}` | ES1 | heap object | 実装済み (identifier/string/numeric keys, shorthand, method shorthand, and basic computed keys) | - | - |
+| Object static methods | ES5+ | runtime builtin | 実装済み (basic `Object.keys` / `values` / `entries` / `hasOwn` / `is` / `fromEntries`) | - | 426 |
 | computed property `obj[key]` | ES1 | dynamic property access | 実装済み (basic) | - | 014 |
 | property access `obj.key` | ES1 | static property access | 実装済み | - | - |
-| method shorthand | ES2015 | object method | 未実装 | P2 | - |
-| computed property literal | ES2015 | `{[expr]: v}` | 未実装 | P2 | - |
+| method shorthand | ES2015 | object method | 実装済み (basic build/runtime value) | - | 410 |
+| computed property literal | ES2015 | `{[expr]: v}` | 実装済み (basic) | - | 410 |
 | spread properties `...obj` | ES2018 | object spreading | 実装済み (basic: static object literals / known static object-literal locals and simple aliases / runtime object values with own string-keyed enumerable data properties) | - | 274, 355 |
-| shorthand properties `{x}` | ES2015 | property shorthand | 未実装 | P2 | - |
+| shorthand properties `{x}` | ES2015 | property shorthand | 実装済み | - | 410 |
 | getter / setter | ES5 | accessor properties | 未実装 | P2 | - |
 
 ## 配列
@@ -214,7 +215,7 @@ BigInt mixed comparison の object `ToPrimitive` boundary: direct object-literal
 | array literal `[e0, e1, ...]` | ES1 | heap object | 実装済み (dense) | - | - |
 | array index `arr[n]` | ES1 | numeric index | 実装済み | - | - |
 | `arr.length` | ES1 | length property | 実装済み | - | - |
-| array holes `[1, , 3]` | ES1 | sparse array | 未実装 | P2 | - |
+| array holes `[1, , 3]` | ES1 | sparse array | 部分実装 (literal/new Array holes preserve presence bits; covered map/iteration paths match Node) | P2 | 412 |
 | spread elements `[...arr]` | ES6 | array spreading | 実装済み (basic: dense literals / known array locals including sparse arrays and simple aliases / known Set locals / ASCII literal-derived strings, including static `+` concatenation; sparse source holes materialize as present `undefined`) | - | 274, 354 |
 | destructuring binding patterns `let [a, b] = arr` | ES6 | pattern matching | Parser accepts declarations/parameters; simple identifier-only array/object declaration bindings are runtime-supported for the covered dense-array/object-property subset, including array elisions/rest, nested array/object bindings, static object-literal rest, and literal default initializers; object rest for dynamic sources remains issue-linked unsupported | P2 | 247, 251 |
 | destructuring assignment `[a, b] = arr` | ES6 | pattern matching | Parser accepts array/object assignment patterns; runtime assignment semantics are 未実装 | P2 | 252 |
@@ -223,13 +224,13 @@ BigInt mixed comparison の object `ToPrimitive` boundary: direct object-literal
 
 | 機能 | ECMAScript | 対応方針 | 実装状況 | 優先度 | Issue ID |
 |---|---|---|---|---|---|
-| `class` declaration | ES6 | prototype-based class | 部分実装（backend prototype method emission in progress; no `extends`/`super`/static fields） | P1 | 5026 |
-| `class` expression | ES6 | anonymous class | 未実装 | P1 | - |
-| `extends` (inheritance) | ES6 | prototype chain | 未実装 | P1 | - |
-| `constructor` | ES6 | class constructor | 未実装 | P1 | - |
-| `super` | ES6 | parent class access | 未実装 | P1 | - |
-| static methods/fields | ES6 | class static members | 未実装 | P2 | - |
-| static initialization blocks | ES2022 | class static block parser/semantics | 実装済み（supported statement list executes at class declaration time in source order; `this` / `super` static-block forms remain issue-254 diagnostics） | - | 249, 254 |
+| `class` declaration | ES6 | prototype-based class | 部分実装（class getter/setter fixture passes node_diff; extends+super, static methods, named class expression verified; static field initializers build only） | P1 | 5026, 236 |
+| `class` expression | ES6 | anonymous class / named class expression | 部分実装（anonymous + named class expression both pass node_diff; IIAC 未対応） | P1 | 236 |
+| `extends` (inheritance) | ES6 | prototype chain | 部分実装（class-extends + super() + super.method() pass node_diff; extends null 未対応） | P1 | 236 |
+| `constructor` | ES6 | class constructor | 部分実装（basic constructor + super() constructor chain pass node_diff; constructor overload detection 未対応） | P1 | 236 |
+| `super` | ES6 | parent class access | 部分実装（super.method(), super(), super.property, super in arrow pass node_diff; super() in non-derived 未対応） | P1 | 236 |
+| static methods/fields | ES6 | class static members | 部分実装（static method + this pass node_diff; static field initializers build only） | P2 | 236 |
+| static initialization blocks | ES2022 | class static block parser/semantics | 実装済み（supported statement list executes at class declaration time in source order; `this` in static blocks is bound to the class constructor object; `super` static-block forms remain issue-254 diagnostics） | - | 249, 254 |
 | private fields/methods `#x` | ES2022 | private class elements | 部分実装（non-derived instance private field initializer and direct same-class instance private field read/write use backend-internal branded private slots with Node/iwasm differential and GC-pressure coverage, including non-`this` receivers inside the declaring class; direct non-derived instance private methods called as `this.#m()` and same-class non-`this` private method receivers inside the declaring class have Node/iwasm differential coverage with receiver brand checks that do not execute the method body on mismatch in the supported statement-boundary `try/catch` shape; static private methods called as `this.#m()` from static methods or `Class.#m()` inside the declaring class, private getters read as `this.#x` and same-class non-`this` private getter receivers, private setters assigned as `this.#x = value`, static private accessors read/written as `this.#x` or `Class.#x`, and direct same-class static private fields read/written as `this.#x` or `Class.#x` inside the declaring class have Node/iwasm differential coverage; static private fields and static blocks execute in source order for direct same-class `Class.#x` access, with forward static-block access diagnosed as issue-352; ordinary backing-key access/enumeration remains guarded; backend private field get/set carries a per-class brand token and guards both brand and slot count before touching private storage, and mismatches now emit a runtime `TypeError` diagnostic when uncaught or raise a catchable TypeError-like object in the supported `try/catch` statement-boundary slice instead of returning `undefined`; top-level external syntax lowering, extracted private method/accessor values, private setter non-`this` receiver checks, accessor duplicate-pair semantics, and expression-nested exception propagation remain issue-351/issue-255） | P2 | 248, 255, 351, 352 |
 | prototype chain | ES1 | `__proto__` / inheritance | 実装済み (basic `Object.getPrototypeOf` / `Object.setPrototypeOf` / class prototype links) | - | 048, 207 |
 
@@ -243,6 +244,7 @@ BigInt mixed comparison の object `ToPrimitive` boundary: direct object-literal
 | string indexing `str[n]` | ES5 | UTF-16 code unit | 実装済み (basic) | - | 043 |
 | `String.fromCharCode` | ES1 | code unit to string | 実装済み (basic) | - | 044 |
 | `String.prototype.charCodeAt` | ES1 | string to code unit | 実装済み (basic) | - | 044 |
+| `String.fromCodePoint` / `String.raw` / `String.prototype.at` / `codePointAt` / `toLocaleString` | ES6+ | runtime builtin | 実装済み (basic; `String.raw` は raw 配列 + 1 substitution の Node differential coverage) | - | 461 |
 
 ## 非同期処理
 
@@ -258,18 +260,18 @@ BigInt mixed comparison の object `ToPrimitive` boundary: direct object-literal
 | 機能 | ECMAScript | 対応方針 | 実装状況 | 優先度 | Issue ID |
 |---|---|---|---|---|---|
 | `import` / `export` | ES6 | static module system | 未実装 | P1 | - |
-| `import()` (dynamic) | ES2020 | dynamic import | 未実装 | P2 | - |
+| `import()` (dynamic) | ES2020 | dynamic import | 部分実装 (literal specifier build path; IR preserves dynamic-import module-load kind) | P2 | 408 |
 | `require()` (CommonJS) | (非標準) | compile-time builtin | 未実装 | P2 | - |
 
 ## その他
 
 | 機能 | ECMAScript | 対応方針 | 実装状況 | 優先度 | Issue ID |
 |---|---|---|---|---|---|
-| `eval` | ES1 | dynamic code evaluation | 部分実装 (static string direct `eval(...)` expression statements are expanded in the parser/resolver slice; indirect/dynamic runtime eval remains unsupported) | P3 | 347, 349 |
+| `eval` / `Function` | ES1 | dynamic code evaluation | 部分実装 (static string direct `eval(...)`, supported static string indirect/optional eval shapes, and literal-only `Function(...)` / `new Function(...)` have compile-time AOT expansion slices; runtime-source eval and dynamic Function constructor have audited capability-gated host-lane slices with exact `host.eval.indirect`, `host.eval.direct`, `host.function.compile`, `host.function.call`, `host.function.callMethod`, and `host.function.construct` imports as needed. Broader direct-eval lexical declarations, TDZ, realm/global-env behavior, first-class `FunctionConstructorPlan`, and runtime-wide host external object/function contracts remain incomplete) | P3 | 347, 349 |
 | `with` | ES1 | scope extension | 未実装 (unsupported-dynamic-code) | P3 | - |
-| `Proxy` | ES6 | meta-programming | 未実装 | P3 | - |
+| `Proxy` | ES6 | meta-programming | 部分実装 (statically visible `new Proxy(target, handler)` locals support basic get/set/has/deleteProperty trap lowering) | P3 | 407 |
 | `Reflect` | ES6 | reflection API | 未実装 | P3 | - |
-| `Map` / `Set` / `WeakMap` / `WeakSet` | ES6 | collection types | 未実装 | P1 | - |
+| `Map` / `Set` / `WeakMap` / `WeakSet` | ES6 | collection types | 実装済み (WeakMap set/get/has/delete and WeakSet add/has/delete are covered by Node differential fixtures) | P1 | 423 |
 | `Date` | ES1 | date/time | 未実装 | P1 | - |
 | `RegExp` | ES3 | regular expressions | 部分実装 (literal pattern byte matching; `test`/`match`/`exec`; character class `[...]` / case-insensitive `i` flag / extended escape sequences supported) | P1 | 051, 214, 5004 |
 | `JSON` | ES5 | JSON parsing/stringifying | 未実装 | P1 | - |

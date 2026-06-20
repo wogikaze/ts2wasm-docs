@@ -1,31 +1,15 @@
-# Related projects
+# Related Projects
 
-この文書は related projects を競合ではなく比較対象として整理する。
+This project sits between source-to-source TypeScript tooling, embedded JS engines, and wasm component tooling.
 
-## Projects
-
-関連プロジェクトは、競合というより比較対象として扱う。特に QuickJS と AssemblyScript は重要だが、どちらもこのプロジェクトと完全には一致しない。
-
-| Project        | 概要                        | 強み                           | このプロジェクトとの差分                                  |
-| -------------- | ------------------------- | ---------------------------- | --------------------------------------------- |
-| QuickJS        | 小型 JavaScript engine      | JS 互換性が高い                    | JS を WASM にトランスパイルするのではなく、JS engine を動かす方向    |
-| AssemblyScript | TypeScript 風構文から WASM を生成 | WASM 向けに設計されている              | TypeScript / JavaScript 完全互換ではなく、サポート範囲が別言語寄り |
-| Emscripten     | C/C++ から WASM             | runtime / libc / JS glue が成熟 | TypeScript 入力ではない                             |
-| wasm-bindgen   | Rust と JS の橋渡し            | JS interop が強い               | TypeScript を WASM にする compiler ではない           |
-| Javy           | JS を WASM で実行             | WASI 上で JS を動かせる             | transpiler というより JS runtime 同梱に近い             |
-| tsc            | TypeScript 公式 compiler    | 仕様挙動の基準                      | 出力は JS であり WASM ではない                          |
-| TypeScript-Go  | TypeScript 実装の再構成         | parser/checker 実装の参考         | WASM backend を目的としているわけではない                   |
-
-このプロジェクトの立ち位置は、AssemblyScript より TypeScript 互換に寄せ、QuickJS より compiler / transpiler に寄せる位置にある。つまり、「TypeScript 風の WASM 言語」でも「WASM 上の JS interpreter」でもなく、「TypeScript / JavaScript の実行意味論を保ったまま WASM に落とす compiler」を目指す。
-
-## Comparison axes
-
-| Axis | Question |
+| Project family | Difference from ts2wasm |
 |---|---|
-| Input language | TypeScript/JavaScript そのものか、TS-like subset か |
-| Execution model | compiler output か、JS engine/runtime 同梱か |
-| WASM independence | generated wasm がどれだけ自律的に動くか |
-| Node dependency | Node API に逃がす量 |
-| Compatibility | JS/TS 意味論の再現度 |
-| Performance strategy | AOT optimization か runtime/JIT/interpreter か |
-| Host interface | WASI / Node host / Component Model / WIT |
+| TypeScript / typescript-go | Type checking and transpilation are references/oracles; ts2wasm emits wasm with a runtime subset. |
+| AssemblyScript | AssemblyScript is a TS-like language with different runtime assumptions; ts2wasm targets existing JS/TS semantics where possible. |
+| QuickJS / QuickJS-ng | Full JS engine approach; ts2wasm avoids bundling a full engine and instead compiles/lower supported semantics. |
+| Javy | JS-to-WASM using a JS engine runtime; ts2wasm focuses on explicit runtime helper/link plan and capability manifest. |
+| wasm-bindgen | Rust/wasm interop tooling; ts2wasm compiles JS/TS source. |
+| wasm-tools / wasmtime / WAMR | Execution/validation/reference tooling used around wasm output, not compiler replacement. |
+| JCO/component model tools | Future target inspiration; current component target is reserved but unimplemented. |
+
+Use related projects for comparison and validation, not as hidden dependencies in the compiler pipeline.

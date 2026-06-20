@@ -1,97 +1,31 @@
-# Parallel Parent/Child Development
+# Parallel Development
 
-This workflow runs child agents in isolated git worktrees while a parent agent supervises assignment, review, merge, and Discord reporting.
+## When to use parent/child worktrees
 
-It intentionally does not use `.agents/state`, `current_task.json`, `project_state.json`, or `dev-loop`.
+Use child worktrees when work can be split by independent file scopes, especially compiler/runtime/test/docs slices that would otherwise collide or exceed one focused iteration.
 
-## Layout
-
-- Worktrees live in sibling directories: `../ts2wasm-<prefix>-<id>-<timestamp>/`
-- Parent/child prompts live under `.agents/prompts/`
-- Local assignment files live under ignored `reports/agents/<agent_id>/assignment.md`
-- Discord run reports live under ignored `reports/runs/<run_id>/`
-- Reference corpus is symlinked with `mise run link-reference`
-
-## Parent Loop
-
-The parent follows:
-
-```text
-SYNC -> QUEUE_SCAN -> SPLIT_OR_SELECT -> WORKTREE_ASSIGN
--> CHILD_SUPERVISE -> MERGE_REVIEW -> REPORT -> QUEUE_REFILL
-```
-
-The tracked source of truth remains `issues/`, `docs/`, and git history. Parent queue notes and child assignments are local report artifacts, not tracked state.
-
-## Batch Worktree Creation
-
-Create one worktree per issue:
+## Commands
 
 ```bash
-mise run spawn-worktrees -- \
-  --base master \
-  issues/open/225-*.md \
-  issues/open/255-*.md
+python scripts/manager.py spawn-worktrees -- --base master --prefix <prefix> <issue-file>...
+python scripts/manager.py worktree-status
+python scripts/manager.py git-worktree
 ```
 
-The command outputs a JSON manifest and creates local assignment files under `reports/agents/`.
+## Parent responsibilities
 
-Each worktree gets:
+- Define child scopes and done criteria.
+- Avoid assigning the same file to multiple children.
+- Merge child commits in a deliberate order.
+- Run final focused and broader gates.
+- Record any unresolved blocker with the next command/file.
 
-- isolated branch from `--base`
-- reference corpus symlink when available
-- shared cargo `target/` through `.cargo/config.toml`
-- no `.agents/state` files
+## Child responsibilities
 
-## Child Launch
+- Do not stop at investigation unless explicitly assigned.
+- Produce a coherent change and focused validation.
+- Report changed files, validation result, blockers, and commit/patch.
 
-For each manifest entry, start a child with:
+## Docs-specific note
 
-- prompt: `.agents/prompts/autonomous-child-worker.md`
-- assignment: `reports/agents/<agent_id>/assignment.md`
-- worktree path from the manifest
-
-The child reports back with a `PARENT_EVENT:` line.
-
-## Status Collection
-
-Collect all worktree status:
-
-```bash
-mise run worktree-status -- --format json
-```
-
-Useful variants:
-
-```bash
-mise run worktree-status -- --dirty-only
-mise run worktree-status -- --ahead-only --base origin/master
-```
-
-## Merge Review
-
-The parent reviews each child branch before merge:
-
-1. Inspect diff scope and commits.
-2. Confirm validation evidence.
-3. Run relevant narrow validation.
-4. Run `mise run check`.
-5. Merge or cherry-pick only after review passes.
-6. Run `mise run update-issue-index` and `mise run check issues` when issues changed.
-
-## Discord Reporting
-
-Discord reporting is required after each parent cycle and issue-close wave:
-
-```bash
-mise run discord-report -- reports/runs/<run_id>/cycle_report.md --run-id <run_id>
-```
-
-If sending fails or no webhook is configured, save the markdown/payload under `reports/runs/<run_id>/` and report that it is deferred.
-
-## Prerequisites
-
-- `mise run spawn-worktrees`
-- `mise run worktree-status`
-- `mise run discord-report`
-- `mise run check`
+For broad documentation work, split by canonical docs, agent/skill docs, and archive headers. Do not rewrite `issues/` unless requested.

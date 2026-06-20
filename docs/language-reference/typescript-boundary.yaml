@@ -1,0 +1,135 @@
+schema_version: 1
+
+# TypeScript syntax boundary manifest
+#
+# Each feature is classified by its mode (how the compiler handles it),
+# owner (which layer implements it), and tracking info.
+#
+# Modes:
+#   erase - Parser accepts, erasure pass removes before runtime lowering
+#   reject - Parser recognizes but rejects with diagnostic
+#   runtime - Lowered to runtime JS semantics, implemented by IR+backend
+#   declaration_emit_deferred - Declaration emit tracked separately
+#   deferred - Not yet implemented, has a tracking issue
+
+features:
+  # === Parse-and-erase ===
+  - feature: type-alias
+    mode: erase
+    owner: frontend
+    fixture: fixtures/basics-types/type-alias-erasure.ts
+    diagnostic_code: null
+
+  - feature: interface
+    mode: erase
+    owner: frontend
+    fixture: fixtures/basics-types/interface-erasure.ts
+    diagnostic_code: null
+
+  - feature: type-annotation
+    mode: erase
+    owner: frontend
+    fixture: fixtures/basics-types/type-annotation-erasure.ts
+    diagnostic_code: null
+
+  - feature: as-assertion
+    mode: erase
+    owner: frontend
+    fixture: fixtures/basics-types/as-assertion-erasure.ts
+    diagnostic_code: null
+
+  - feature: satisfies
+    mode: erase
+    owner: frontend
+    fixture: fixtures/basics-types/satisfies-erasure.ts
+    diagnostic_code: null
+
+  - feature: generic-type-params
+    mode: erase
+    owner: frontend
+    fixture: fixtures/basics-types/generic-erasure.ts
+    diagnostic_code: null
+
+  - feature: ambient-declaration
+    mode: erase
+    owner: frontend
+    fixture: fixtures/basics-types/ambient-erasure-comprehensive.ts
+    diagnostic_code: null
+
+  - feature: ambient-namespace
+    mode: erase
+    owner: frontend
+    fixture: fixtures/basics-types/ambient-namespace-erasure.ts
+    diagnostic_code: null
+
+  - feature: const-assertion
+    mode: erase
+    owner: frontend
+    fixture: fixtures/basics-types/satisfies-const-erasure.ts
+    diagnostic_code: null
+
+  - feature: type-only-import
+    mode: erase
+    owner: frontend
+    fixture: null
+    diagnostic_code: null
+
+  # === Reject-as-unsupported ===
+  - feature: enum
+    mode: reject
+    owner: frontend
+    fixture: null
+    diagnostic_code: UnsupportedTypeScriptSyntax
+
+  - feature: namespace-runtime
+    mode: reject
+    owner: frontend
+    fixture: null
+    diagnostic_code: UnsupportedTypeScriptSyntax
+
+  - feature: decorator
+    mode: reject
+    owner: frontend
+    fixture: null
+    diagnostic_code: UnsupportedTypeScriptSyntax
+
+  - feature: declare-global
+    mode: reject
+    owner: frontend
+    fixture: null
+    diagnostic_code: UnsupportedTypeScriptSyntax
+
+  # === Runtime-bearing (lowered to JS semantics) ===
+  - feature: class
+    mode: runtime
+    owner: ir+runtime
+    fixture: null
+    diagnostic_code: null
+
+  - feature: arrow-function
+    mode: runtime
+    owner: ir+runtime
+    fixture: null
+    diagnostic_code: null
+
+  - feature: async-await
+    mode: deferred
+    owner: ir+runtime
+    fixture: null
+    diagnostic_code: UnsupportedTypeScriptSyntax
+    tracking: issue-050
+
+  - feature: decorator-runtime
+    mode: deferred
+    owner: frontend+runtime
+    fixture: null
+    diagnostic_code: UnsupportedTypeScriptSyntax
+    tracking: issue-050
+
+  # === Declaration emit (deferred) ===
+  - feature: declaration-emit
+    mode: declaration_emit_deferred
+    owner: frontend
+    fixture: null
+    diagnostic_code: UnsupportedTypeScriptSyntax
+    tracking: issue-346

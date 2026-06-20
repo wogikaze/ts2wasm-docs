@@ -113,7 +113,7 @@ Parser wave の通常順序:
 4. reference-triage で parser failure か semantic failure かを確認する
 5. parser-only acceptance を満たしたら、semantic gap は別 issue に分ける
 
-`issues/open/059-implement-parser-syntax-extensions.md` と `issues/done/200-implement-parser-syntax.md` のような epic/generated bucket は、この分割作業の入力として扱う。直接の implementation work order にはしない。
+TRACKING.yaml の open/done items をこの分割作業の入力として扱う。各 item は TRACKING id で識別する。直接の implementation work order にはしない。
 
 ## 完了条件
 
